@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddProvinceOfUsers extends Migration
+class AddProvinceOfInfo extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class AddProvinceOfUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('info', function (Blueprint $table) {
             $table->string('province');
             $table->string('linhvuc');
             $table->text('mota');

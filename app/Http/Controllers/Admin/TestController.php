@@ -63,9 +63,9 @@ class TestController extends Controller
     public function ajax(Request $req) {
         $user = model_Users::where('email', $req->id)->get();
         if(count($user) == 0)
-            return 'email khong ton tai';
+            return 'Email hợp lệ';
         else 
-            return 'email da ton tai';
+            return 'Email đã tồn tại';
 
     }
 

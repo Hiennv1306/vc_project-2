@@ -11,27 +11,29 @@
 |
 */
 
-Route::get('/', function () {
-    return view('');
+// Route::get('/admin', function () {
+//     return view('');
+// });
+Route::group(['middleware' => 'auth'], function () {
+
+	Route::group(['prefix' => 'admin'], function() {
+		Route::group(['prefix' => 'user'], function() {
+			Route::get('list', ['as' => 'getList', 'uses' => 'Admin\TestController@danhsach'])->name('home');
+			Route::get('add', ['as' => 'getUserAdd', 'uses' => 'Admin\TestController@add']);
+			Route::post('add', 'Admin\TestController@actionAdd')->name('actionAdd');
+			Route::get('edit/{id}', 'Admin\TestController@edit');
+			Route::post('edit', 'Admin\TestController@actionEdit')->name('actionEdit');
+			Route::delete('delete/{id}', 'Admin\TestController@destroy')->name('delete');
+			Route::post('ajax', 'Admin\TestController@ajax')->name('ajax');
+		});
+	});
 });
 
-Route::group(['prefix' => 'admin/user', 'namespace' => 'Admin'], function() {
-
-	Route::get('list', 'TestController@danhsach')->name('list');
-
-	Route::get('add', 'TestController@add');
-	Route::post('add', 'TestController@actionAdd')->name('actionAdd');
-
-	Route::get('edit/{id}', 'TestController@edit');
-	Route::post('edit', 'TestController@actionEdit')->name('actionEdit');
-
-	Route::delete('delete/{id}', 'TestController@destroy')->name('delete');
-
-	Route::post('ajax', 'TestController@ajax')->name('ajax');
-
-
-});
+// Route::get('admin', '\App\Http\Controllers\Auth\LoginController@login')->name('login');
+Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+// Route::get('/home', 'HomeController@index')->name('home');
+
+

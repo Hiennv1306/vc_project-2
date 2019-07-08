@@ -39,9 +39,9 @@
                         <div class="col-md-6">
                            <div class="form-group"> <label> <span class="label-text">Address: *</span> <input type="text" name="address" value="{{old('address')}}" class="form-control" required=""> </label> </div>
                         </div>
-                        <div class="col-md-6">
+                        <!-- <div class="col-md-6">
                            <div class="form-group"> <label> <span class="label-text">Password</span> <input type="password" name="address" value="{{old('password')}}" class="form-control" required=""> </label> </div>
-                        </div>
+                        </div> -->
                         <div class="col-md-6" >
                            <div class="form-group ">
                               <select name="province"  class="select form-control">
@@ -137,6 +137,7 @@
             },
             success: function(data) {
                $('#hien').html(data);
+               
             },
             error: function(err) {
                console.log(err);
