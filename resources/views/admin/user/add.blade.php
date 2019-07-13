@@ -1,6 +1,18 @@
 @extends('admin.index')
 @section('title', 'List User')
 @section('content')
+
+<style type="text/css">
+   p.error {
+      color: #a94442;
+      font-weight: bold;
+   }
+
+   p.success {
+      color: #28a745;
+      font-weight: bold;
+   }
+</style>
 <main class="main--container">
    <section class="main--content">
       <div class="panel">
@@ -44,22 +56,11 @@
                         </div> -->
                         <div class="col-md-6" >
                            <div class="form-group ">
-                              <select name="province"  class="select form-control">
-                                 <option  placeholder="Tỉnh thành" value="{{old('province')}}">{{old('province')}}</option>
-                                 <option value="Ninh Binh">Ninh Binh</option>
-                                 <option value="Ha Noi">Ha Noi</option>
-                                 <option value="Hải Phòng">Hải Phòng</option>
-                                 <option value="Nam Định">Nam Định</option>
-                                 <option value="Nghệ An">Nghệ An</option>
-                                 <option value="Hưng Yên">Hưng Yên</option>
-                                 <option value="Hà Nam">Hà Nam</option>
-                                 <option value="Hà Tĩnh">Hà Tĩnh</option>
-                                 <option value="Thanh Hóa">Thanh Hóa</option>
-                                 <option value="Lào Cai">Lào Cai</option>
-                                 <option value="Bắc Giang">Bắc Giang</option>
-                                 <option value="TP.HCM">TP.HCM</option>
-                                 <option value="Đà Nẵng">Đà Nẵng</option>
-                                 <option value="Quảng Trị">Quảng Trị</option>
+                              <span class="label-text">Province: </span> 
+                              <select name="province_id"  placeholder="Tỉnh thành"  class="select form-control">
+                                 @foreach($province as $pr)
+                                    <option value="{{$pr->id}}" <?php old('province') == $pr->id ? 'selected' : '' ?>>{{$pr->name}}</option>
+                                 @endforeach
                               </select>
                            </div>
                         </div>
@@ -101,13 +102,7 @@
                      </div>
                   </section>
                </div>
-               <div class="actions clearfix">
-                  <ul role="menu" aria-label="Pagination">
-                     <li class="disabled" aria-disabled="true"><a href="#previous" role="menuitem">Previous</a></li>
-                     <li aria-hidden="false" aria-disabled="false"><a href="#next" role="menuitem">Next</a></li>
-                     <li aria-hidden="true" style="display: none;"><a href="#finish" role="menuitem">Finish</a></li>
-                  </ul>
-               </div>
+               
             </form>
          </div>
       </div>
@@ -118,6 +113,7 @@
 </main>
 <script type="text/javascript">
    $(document).ready(function(){
+
       $('#input-email').blur(function(){
          var value = $(this).val();
          /*$.post('{{route("ajax")}}',{id: value},function(data){
@@ -135,8 +131,20 @@
             headers: {
                'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            success: function(data) {
-               $('#hien').html(data);
+            dataType: 'json',
+            success: function(result) {
+               console.log(result);
+               if(result.status == 'false') {
+                  $('#hien').html(result.message);
+                  $('#input-email').css('borderColor', '#a94442');
+                  alert(result.data.status2);
+
+               } else {
+                  $('#hien').html(result.message);
+                  $('#input-email').css('borderColor', '#28a745');
+                  alert(result.data.status2);
+
+               }
                
             },
             error: function(err) {

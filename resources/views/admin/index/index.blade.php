@@ -262,5 +262,4 @@
          <p>Copyright © <a href="#">DAdmin</a>. All Rights Reserved.</p>
       </footer>
    </main>
-    
 @endsection

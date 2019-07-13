@@ -5,21 +5,31 @@
    <section class="main--content">
       <div class="panel">
          <div class="records--header">
-            <div class="title fa-shopping-bag">
-               <h3 class="h3">Ecommerce Products <a href="#" class="btn btn-sm btn-outline-info">Manage Products</a></h3>
-               <p>Found Total 1,330 Products</p>
-            </div>
+
             <div class="actions">
-               <form action="#" class="search flex-wrap flex-md-nowrap">
-                  <input type="text" class="form-control" placeholder="Product Name..." required=""> 
-                  <select name="select" class="form-control">
-                     <option value="" selected="">Product Category</option>
+
+               <form action="{{ url('admin/user/search') }}" method="post" class="search flex-wrap flex-md-nowrap" onsubmit="return false;" id="search-form">
+                  <input type="text" class="form-control" name="name" placeholder="Name..." > 
+                  <select name="diachi" class="form-control">
+                     <option value="" disabled="" selected="">Tỉnh thành...</option>
+                     @foreach($province as $pr)
+                     <option value="{{$pr->id}}" >{{$pr->name}}</option>
+                     @endforeach
                   </select>
-                  <button type="submit" class="btn btn-rounded"><i class="fa fa-search"></i></button> 
+                  <button id="search" type="submit" class="btn btn-rounded"><i class="fa fa-search"></i></button> 
                </form>
                <a href="{{url('admin/user/add')}}" class="addProduct btn btn-lg btn-rounded btn-warning">Add Product</a> 
             </div>
          </div>
+         @if ($errors->any())
+             <div class="alert alert-danger">
+                 <ul>
+                     @foreach ($errors->all() as $error)
+                         <li>{{ $error }}</li>
+                     @endforeach
+                 </ul>
+             </div>
+         @endif
       </div>
       <div class="panel">
          <div class="records--list" data-title="Product Listing">
@@ -43,56 +53,81 @@
                            <th class="not-sortable sorting_disabled" rowspan="1" colspan="1" aria-label="Actions" style="width: 93px;">Actions</th>
                         </tr>
                      </thead>
-                     <tbody>
-                        @foreach($user_list as $ul)
-                        <tr role="row" class="odd">
-                           <td> <a href="#" class="btn-link">{{$ul->id}}</a> </td>
-                           <td> <a href="#" class="btn-link">{{$ul->name}}</a> </td>
-                           <td> <a href="#" class="btn-link">{{$ul->phone}}</a> </td>
-                           <td> <a href="#" class="btn-link">{{$ul->email}}</a> </td>
-                           <td> <a href="#" class="btn-link">{{$ul->address}}</a> </td>
-                           <td> <a href="#" class="btn-link">{{$ul->gender}}</a> </td>
-                           <td> <a href="#" class="btn-link">{{$ul->province}}</a> </td>
-                           <td> <a href="#" class="btn-link">
-                              <?php
-                                 $list = explode(',', $ul->linhvuc);
-                                 foreach ($list as $value) {
-                                    echo $value . '<br>';
-                                 }
-                              ?>
-                           </a> </td>
-                          
-                         <!--   <td>12 June 2017</td> -->
-                           <td>
-                              
-                                 <div class="dropleft">
-                                 <a href="#" class="btn-link" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a> 
-                                 <div class="dropdown-menu" x-placement="left-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-2px, 0px, 0px);"> <a href="{{url('admin/user/edit/'.$ul->id)}}" class="dropdown-item">Edit</a>
-
-                                    <form method="POST" action="{{ route('delete', ['id' => $ul->id]) }}">
-                                       @csrf
-                                       {{method_field('DELETE')}}
-                                       <button class="dropdown-item">Delete</button>  
-                                       
-                                    </form>
-                                 </div>
-                              </div>
-                              
-                              
-                           </td>
-                        </tr>
-                        @endforeach
+                     <tbody id="hien">
+                        @include('admin.user.listTemplade')
                        
                      </tbody>
                   </table>
-                  <?php echo $user_list->links();?>
+                  <div id="paginate-ngoc">
+                     {{ $user_list->links() }}
+                  </div>
+                  
                </div>
             </div>
          </div>
       </div>
    </section>
    <footer class="main--footer main--footer-light">
-      <p>Copyright © <a href="#">DAdmin</a>. All Rights Reserved.</p>
+      <p>Copyright © <a href="#">VAdmin</a>. All Rights Reserved.</p>
    </footer>
 </main>
+<script type="text/javascript">
+   $(document).ready(function(){
+      $("#search").click(function(){
+        getDatas(1);
+      });
+
+      $(window).on('hashchange', function() {
+          if (window.location.hash) {
+              var page = window.location.hash.replace('#', '');
+              if (page == Number.NaN || page <= 0) {
+                  return false;
+              } else {
+                  getDatas(page);
+              }
+          }
+      });   
+
+      $(document).ready(function() {
+          $(document).on('click', '.pagination a', function (e) {
+              var url = $(this).attr('href'); 
+              getDatas($(this).attr('href').split('page=')[1]);
+
+               let page = $(this).text();
+               let current_page = `<span class="page-link">${page}</span>`;
+               $(this).after(current_page);
+               $(this).parent().addClass('active');
+
+               $(this).parent().siblings('.page-item').removeClass('active').each(function() {
+                  let p = $(this).text();
+                  $(this).html(`<a class="page-link" href="admin/user/list?page=${p}">${p}</a>`);
+               });
+               $(this).remove();
+              e.preventDefault();
+          });
+      });
+
+      function getDatas(page) {
+         var form = $("#search-form");
+         var form_data = form.serialize();
+
+          $.ajax({
+              url : '?page=' + page,
+              type : "get",
+              dataType: 'json',
+              data: form_data,
+              headers: {
+                  'X-CSRF-TOKEN': '{{ csrf_token() }}'
+               },
+          }).done(function (result) {
+               $('#hien').html(result);
+              location.hash = page;
+
+          }).fail(function (msg) {
+            console.log(msg);
+              alert('ngu người');
+          });
+      }
+   });
+</script>
 @endsection
